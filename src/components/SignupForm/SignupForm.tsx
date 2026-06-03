@@ -1,21 +1,18 @@
 import { useState } from 'react';
 import { useAuth } from '../../services/auth';
-import './LoginForm.css';
+import '../LoginForm/LoginForm.css';
 
 // Maps Firebase error codes to friendly Spanish messages
-function getLoginError(code: string): string {
+function getSignupError(code: string): string {
   switch (code) {
-    case 'auth/user-not-found':
-    case 'auth/invalid-credential':
-      return 'El correo o la contraseña son incorrectos.';
-    case 'auth/wrong-password':
-      return 'Contraseña incorrecta. Intenta de nuevo.';
+    case 'auth/email-already-in-use':
+      return 'Este correo ya tiene una cuenta asociada.';
     case 'auth/invalid-email':
       return 'El formato del correo no es válido.';
+    case 'auth/weak-password':
+      return 'La contraseña debe tener al menos 6 caracteres.';
     case 'auth/too-many-requests':
-      return 'Demasiados intentos fallidos. Espera un momento.';
-    case 'auth/user-disabled':
-      return 'Esta cuenta ha sido deshabilitada.';
+      return 'Demasiados intentos. Espera un momento.';
     default:
       return 'Ocurrió un error inesperado. Intenta de nuevo.';
   }
@@ -23,11 +20,12 @@ function getLoginError(code: string): string {
 
 type Feedback = { type: 'success' | 'error'; message: string } | null;
 
-function LoginForm() {
-  const { signIn, signInWithGoogle } = useAuth();
+function SignupForm() {
+  const { signUp, signInWithGoogle } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -35,13 +33,22 @@ function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
+
+    if (password !== confirm) {
+      setFeedback({ type: 'error', message: 'Las contraseñas no coinciden.' });
+      return;
+    }
+
     setLoading(true);
     try {
-      await signIn(email, password);
-      setFeedback({ type: 'success', message: '¡Sesión iniciada correctamente!' });
+      await signUp(email, password);
+      setFeedback({ type: 'success', message: '¡Usuario creado exitosamente! Ya puedes iniciar sesión.' });
+      setEmail('');
+      setPassword('');
+      setConfirm('');
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? '';
-      setFeedback({ type: 'error', message: getLoginError(code) });
+      setFeedback({ type: 'error', message: getSignupError(code) });
     } finally {
       setLoading(false);
     }
@@ -52,11 +59,11 @@ function LoginForm() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      setFeedback({ type: 'success', message: '¡Sesión iniciada con Google!' });
+      setFeedback({ type: 'success', message: '¡Cuenta creada e ingresada con Google!' });
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? '';
       if (code !== 'auth/popup-closed-by-user') {
-        setFeedback({ type: 'error', message: getLoginError(code) });
+        setFeedback({ type: 'error', message: getSignupError(code) });
       }
     } finally {
       setGoogleLoading(false);
@@ -67,7 +74,7 @@ function LoginForm() {
 
   return (
     <div className="auth-card">
-      <h2>Iniciar Sesión</h2>
+      <h2>Crear Cuenta</h2>
 
       {feedback && (
         <div className={`auth-feedback ${feedback.type}`} role="alert">
@@ -77,9 +84,9 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="form-group">
-          <label htmlFor="login-email">Correo Electrónico</label>
+          <label htmlFor="signup-email">Correo Electrónico</label>
           <input
-            id="login-email"
+            id="signup-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -91,14 +98,28 @@ function LoginForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="login-password">Contraseña</label>
+          <label htmlFor="signup-password">Contraseña</label>
           <input
-            id="login-password"
+            id="signup-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            autoComplete="current-password"
+            placeholder="Mínimo 6 caracteres"
+            autoComplete="new-password"
+            required
+            disabled={isDisabled}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="signup-confirm">Confirmar Contraseña</label>
+          <input
+            id="signup-confirm"
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder="Repite tu contraseña"
+            autoComplete="new-password"
             required
             disabled={isDisabled}
           />
@@ -106,7 +127,7 @@ function LoginForm() {
 
         <button type="submit" className="btn-submit" disabled={isDisabled}>
           {loading ? <span className="spinner" aria-hidden="true" /> : null}
-          {loading ? 'Ingresando…' : 'Ingresar'}
+          {loading ? 'Creando cuenta…' : 'Crear Cuenta'}
         </button>
       </form>
 
@@ -117,14 +138,14 @@ function LoginForm() {
         className="btn-google"
         onClick={handleGoogle}
         disabled={isDisabled}
-        aria-label="Iniciar sesión con Google"
+        aria-label="Registrarse con Google"
       >
         {googleLoading ? (
           <span className="spinner spinner-dark" aria-hidden="true" />
         ) : (
           <GoogleIcon />
         )}
-        {googleLoading ? 'Conectando…' : 'Iniciar sesión con Google'}
+        {googleLoading ? 'Conectando…' : 'Registrarse con Google'}
       </button>
     </div>
   );
@@ -153,4 +174,4 @@ function GoogleIcon() {
   );
 }
 
-export default LoginForm;
+export default SignupForm;

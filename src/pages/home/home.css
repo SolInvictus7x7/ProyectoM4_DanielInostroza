@@ -1,0 +1,67 @@
+/* ─── Page layout ─────────────────────────────────────────────── */
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf0ff 100%);
+}
+
+.home-hero {
+  text-align: center;
+  padding: 3.5rem 1rem 2rem;
+}
+
+.home-hero h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.home-hero p {
+  font-size: 1.05rem;
+  color: #555;
+  margin: 0;
+}
+
+/* ─── Auth container ──────────────────────────────────────────── */
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+  padding: 0 1rem 3rem;
+}
+
+/* ─── Tab switcher ────────────────────────────────────────────── */
+.auth-tabs {
+  display: flex;
+  background: #e8eaf0;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+  gap: 4px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.55rem 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.auth-tab.active {
+  background: #ffffff;
+  color: #6c63ff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.10);
+}
+
+.auth-tab:hover:not(.active) {
+  color: #374151;
+}
