@@ -39,7 +39,7 @@
   background: #e8eaf0;
   border-radius: 10px;
   padding: 4px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   gap: 4px;
 }
 
@@ -64,4 +64,27 @@
 
 .auth-tab:hover:not(.active) {
   color: #374151;
+}
+
+/* ─── Full-page loading screen ────────────────────────────────── */
+.page-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f4ff 0%, #faf0ff 100%);
+}
+
+.page-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(108, 99, 255, 0.15);
+  border-top-color: #6c63ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import { auth } from "./firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { auth, db } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -31,7 +32,24 @@ export function Authenticator({ children }: AuthenticatorProps) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDoc = await getDoc(userDocRef);
+
+          if (!userDoc.exists()) {
+            await setDoc(userDocRef, {
+              uid: firebaseUser.uid,
+              username: firebaseUser.displayName || '',
+            });
+          }
+        } catch (error) {
+          console.error(" Error de permisos o conexión en Firestore al crear usuario:", error);
+          // Si ves este error en consola, revisa las Reglas de Seguridad de tu base de datos Firestore.
+        }
+      }
+
       setUser(firebaseUser);
       setLoading(false);
     });
