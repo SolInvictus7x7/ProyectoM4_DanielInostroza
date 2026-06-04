@@ -130,14 +130,14 @@ describe('MyTasksView — task fetching', () => {
   it('fetches tasks from Firestore and renders them in the DOM', async () => {
     /**
      * getDocs is called three times inside fetchMyTasks:
-     *   1st → users collection  (resolve member names for TaskCard dropdowns)
-     *   2nd → groups collection (find the user's groups)
-     *   3rd → tasks collection  (tasks assigned to those groups)
+     *   1st → groups collection (find the user's groups)
+     *   2nd → tasks collection  (tasks assigned to those groups)
+     *   3rd → users collection  (member profiles for TaskCard dropdowns)
      */
     mockGetDocs
-      .mockResolvedValueOnce(makeSnap(FAKE_USERS))   // 1. users
-      .mockResolvedValueOnce(makeSnap(FAKE_GROUPS))  // 2. groups
-      .mockResolvedValueOnce(makeSnap(FAKE_TASKS));  // 3. tasks
+      .mockResolvedValueOnce(makeSnap(FAKE_GROUPS))  // 1. groups
+      .mockResolvedValueOnce(makeSnap(FAKE_TASKS))   // 2. tasks
+      .mockResolvedValueOnce(makeSnap(FAKE_USERS));  // 3. member users
 
     render(
       <MemoryRouter>
@@ -159,8 +159,7 @@ describe('MyTasksView — task fetching', () => {
 
   it('shows the empty-state message when the user has no groups', async () => {
     mockGetDocs
-      .mockResolvedValueOnce(makeSnap(FAKE_USERS))
-      .mockResolvedValueOnce(makeSnap([])); // empty groups
+      .mockResolvedValueOnce(makeSnap([]))  // groups — empty, early return
 
     render(
       <MemoryRouter>
@@ -185,9 +184,9 @@ describe('MyTasksView — task fetching', () => {
     };
 
     mockGetDocs
-      .mockResolvedValueOnce(makeSnap(FAKE_USERS))
-      .mockResolvedValueOnce(makeSnap(FAKE_GROUPS))
-      .mockResolvedValueOnce(makeSnap([otherUserTask]));
+      .mockResolvedValueOnce(makeSnap(FAKE_GROUPS))        // 1. groups
+      .mockResolvedValueOnce(makeSnap([otherUserTask]))    // 2. tasks
+      .mockResolvedValueOnce(makeSnap(FAKE_USERS));        // 3. member users
 
     render(
       <MemoryRouter>

@@ -96,7 +96,7 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
                 type="button"
                 className="btn-danger"
                 onClick={() => {
-                  if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                  if (window.confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
                     onDeleteTask(task.tid);
                   }
                 }}

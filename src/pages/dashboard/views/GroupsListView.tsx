@@ -97,11 +97,13 @@ function GroupsListView() {
         </form>
       )}
 
-      {groups.length === 0 && !showForm ? (
+      {groups.length === 0 && !showForm && (
         <div className="empty-state card">
           <p>No perteneces a ningún grupo todavía.</p>
         </div>
-      ) : (
+      )}
+
+      {groups.length > 0 && (
         <div className="groups-grid">
           {groups.map(g => (
             <Link key={g.gid} to={`/dashboard/groups/${g.gid}`} className="group-card card">

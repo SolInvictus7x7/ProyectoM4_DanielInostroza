@@ -21,38 +21,31 @@ function MyTasksView() {
 
     const fetchMyTasks = async () => {
       try {
-        // Fetch all users to resolve names for task edit dropdowns
-        const usersSnap = await getDocs(collection(db, 'users'));
-        const allUsers = usersSnap.docs.map(d => d.data() as UserProfile);
-        setMemberProfiles(allUsers);
-
         // 1. Fetch user's groups
         const groupsQ = query(collection(db, 'groups'), where('members', 'array-contains', user.uid));
         const groupsSnap = await getDocs(groupsQ);
-        
+
         if (groupsSnap.empty) {
-          setLoading(false);
           return;
         }
 
         const groupsData = groupsSnap.docs.map(d => d.data() as Group);
         const groupIds = groupsData.map(g => g.gid);
-        
+
         // Dictionary for easy group lookup
         const groupDict = groupsData.reduce((acc, g) => {
           acc[g.gid] = g;
           return acc;
         }, {} as Record<string, Group>);
 
-        // 2. Fetch tasks for all those groups
-        const chunkedGroupIds = groupIds.slice(0, 30); 
-        
+        // 2. Fetch tasks for all those groups (Firestore 'in' limit is 30)
+        const chunkedGroupIds = groupIds.slice(0, 30);
         const tasksQ = query(collection(db, 'tasks'), where('assigned-to', 'in', chunkedGroupIds));
         const tasksSnap = await getDocs(tasksQ);
         const allTasks = tasksSnap.docs.map(d => d.data() as Task);
 
         // 3. Filter tasks assigned to this specific user (or whole group)
-        const myTasks = allTasks.filter(t => 
+        const myTasks = allTasks.filter(t =>
           t.members.length === 0 || t.members.includes(user.uid)
         );
 
@@ -67,11 +60,19 @@ function MyTasksView() {
 
         const formattedGrouping: GroupedTasks[] = Object.keys(groupedMap).map(gid => ({
           groupData: groupDict[gid],
-          tasks: groupedMap[gid]
+          tasks: groupedMap[gid],
         }));
 
-        setGroupedTasks(formattedGrouping);
+        // 5. Fetch member profiles for the groups the user belongs to (BUG-10).
+        //    Query only the relevant UIDs instead of the whole users collection.
+        const uniqueMemberUids = [
+          ...new Set(groupsData.flatMap(g => g.members)),
+        ];
+        const membersQ = query(collection(db, 'users'), where('uid', 'in', uniqueMemberUids));
+        const membersSnap = await getDocs(membersQ);
+        setMemberProfiles(membersSnap.docs.map(d => d.data() as UserProfile));
 
+        setGroupedTasks(formattedGrouping);
       } catch (err) {
         console.error("Error fetching tasks:", err);
       } finally {
@@ -110,7 +111,7 @@ function MyTasksView() {
   const handleDeleteTask = async (tid: string, gid: string) => {
     try {
       await deleteDoc(doc(db, 'tasks', tid));
-      
+
       // Remove from the local state
       setGroupedTasks(prev => prev.map(group => ({
         ...group,
@@ -143,7 +144,7 @@ function MyTasksView() {
         <div className="grouped-tasks-container">
           {groupedTasks.map(({ groupData, tasks }) => {
             const isAdmin = groupData['admin-uid'].includes(user!.uid);
-            
+
             // Filter member profiles to only those in THIS group for the edit dropdown
             const thisGroupProfiles = memberProfiles.filter(m => groupData.members.includes(m.uid));
 
@@ -152,8 +153,8 @@ function MyTasksView() {
                 <h3 className="task-group-title">{groupData.title}</h3>
                 <div className="tasks-list">
                   {tasks.map(t => (
-                    <TaskCard 
-                      key={t.tid} 
+                    <TaskCard
+                      key={t.tid}
                       task={t}
                       groupMembers={thisGroupProfiles}
                       isAdmin={isAdmin}

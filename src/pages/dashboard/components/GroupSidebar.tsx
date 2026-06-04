@@ -24,6 +24,10 @@ function GroupSidebar({
   const [sendingEmail, setSendingEmail] = useState(false);
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
 
+  // Run once on mount (and when userUid/userEmail change).
+  // `selectedEmail` is intentionally excluded from deps to prevent a
+  // second run triggered by the setSelectedEmail() call below (BUG-08).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!selectedEmail && userEmail) {
       setSelectedEmail(userEmail);
@@ -36,7 +40,7 @@ function GroupSidebar({
         setCooldownRemaining(Math.ceil(remaining / 1000));
       }
     }
-  }, [userUid, userEmail, selectedEmail]);
+  }, [userUid, userEmail]);
 
   useEffect(() => {
     if (cooldownRemaining <= 0) return;
@@ -60,16 +64,14 @@ function GroupSidebar({
 
       if (!invitedUserDoc) {
         alert("Usuario no encontrado.");
-        setInviting(false);
-        return;
+        return; // finally block resets setInviting (BUG-15)
       }
 
       const invitedUser = invitedUserDoc.data() as UserProfile;
 
       if (group.members.includes(invitedUser.uid)) {
         alert("El usuario ya está en el grupo.");
-        setInviting(false);
-        return;
+        return; // finally block resets setInviting (BUG-15)
       }
 
       await updateDoc(doc(db, 'groups', gid), {
@@ -172,7 +174,7 @@ function GroupSidebar({
           >
             <option value={userEmail || ''}>Tú ({userEmail})</option>
             {memberProfiles
-              .filter(m => m.uid !== userUid && m.email)
+              .filter((m): m is typeof m & { email: string } => m.uid !== userUid && Boolean(m.email))
               .map(m => (
                 <option key={m.uid} value={m.email}>{m.username} ({m.email})</option>
               ))}
