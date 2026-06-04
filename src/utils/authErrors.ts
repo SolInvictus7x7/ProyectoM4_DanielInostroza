@@ -1,4 +1,3 @@
-// Maps Firebase error codes to friendly Spanish messages
 export function getLoginError(code: string): string {
   switch (code) {
     case 'auth/user-not-found':

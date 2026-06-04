@@ -24,8 +24,8 @@ dist-ssr
 *.sw?
 
 .env
+.env*
 
 firestore.rules
-
 
 .vercel

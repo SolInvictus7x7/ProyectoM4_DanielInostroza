@@ -15,7 +15,7 @@ interface SignupFormProps {
 }
 
 function SignupForm({ onSuccess }: SignupFormProps) {
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, logout } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,11 +38,15 @@ function SignupForm({ onSuccess }: SignupFormProps) {
     try {
       const credential = await signUp(email, password);
 
-      // Save uid + username to Firestore users collection
+      // Save uid + username + email to Firestore users collection
       await setDoc(doc(db, 'users', credential.user.uid), {
         uid: credential.user.uid,
         username: username.trim() || '',
+        email: email.trim(),
       });
+
+      // Sign out immediately so they are not auto-logged in and redirected
+      await logout();
 
       // Notify parent (Home) to show success and switch to signin tab
       onSuccess?.('¡Usuario creado exitosamente! Ya puedes iniciar sesión.');

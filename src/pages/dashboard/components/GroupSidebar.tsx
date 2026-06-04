@@ -15,8 +15,8 @@ interface GroupSidebarProps {
   userEmail?: string;
 }
 
-function GroupSidebar({ 
-  gid, group, setGroup, memberProfiles, setMemberProfiles, tasks, isAdmin, userUid, userEmail 
+function GroupSidebar({
+  gid, group, setGroup, memberProfiles, setMemberProfiles, tasks, isAdmin, userUid, userEmail
 }: GroupSidebarProps) {
   const [newMemberName, setNewMemberName] = useState('');
   const [inviting, setInviting] = useState(false);
@@ -57,7 +57,7 @@ function GroupSidebar({
         const data = d.data() as UserProfile;
         return data.username.toLowerCase() === newMemberName.trim().toLowerCase();
       });
-      
+
       if (!invitedUserDoc) {
         alert("Usuario no encontrado.");
         setInviting(false);
@@ -90,11 +90,11 @@ function GroupSidebar({
 
   const handleSendEmail = async () => {
     if (!selectedEmail || !group) return;
-    
+
     setSendingEmail(true);
     try {
-      const taskSummary = tasks.length === 0 
-        ? 'No hay tareas en este grupo actualmente.' 
+      const taskSummary = tasks.length === 0
+        ? 'No hay tareas en este grupo actualmente.'
         : tasks.map(t => `- [${t.complete ? 'X' : ' '}] ${t.title}: ${t.description || 'Sin descripción'}`).join('\n');
 
       const body = {
@@ -139,9 +139,9 @@ function GroupSidebar({
       {isAdmin && (
         <form className="card form-invite" onSubmit={handleInviteMember}>
           <h4>Añadir Miembro</h4>
-          <input 
-            type="text" 
-            placeholder="Nombre de usuario" 
+          <input
+            type="text"
+            placeholder="Nombre de usuario"
             value={newMemberName}
             onChange={e => setNewMemberName(e.target.value)}
             disabled={inviting}
@@ -155,27 +155,36 @@ function GroupSidebar({
       {isAdmin && (
         <div className="card form-invite" style={{ marginTop: '1rem' }}>
           <h4>Enviar Resumen de Tareas</h4>
-          <select 
-            value={selectedEmail} 
+          <select
+            value={selectedEmail}
             onChange={e => setSelectedEmail(e.target.value)}
             disabled={sendingEmail || cooldownRemaining > 0}
-            style={{ width: '100%', padding: '0.8rem', marginBottom: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+            style={{
+              width: '100%',
+              padding: '0.8rem',
+              marginBottom: '0.5rem',
+              borderRadius: '8px',
+              border: '1.5px solid var(--border-color)',
+              backgroundColor: 'var(--bg-input)',
+              color: 'var(--text-primary)',
+              outline: 'none'
+            }}
           >
             <option value={userEmail || ''}>Tú ({userEmail})</option>
             {memberProfiles
               .filter(m => m.uid !== userUid && m.email)
               .map(m => (
-              <option key={m.uid} value={m.email}>{m.username} ({m.email})</option>
-            ))}
+                <option key={m.uid} value={m.email}>{m.username} ({m.email})</option>
+              ))}
           </select>
-          
-          <button 
-            className="btn-primary" 
+
+          <button
+            className="btn-primary"
             onClick={handleSendEmail}
-            disabled={sendingEmail || cooldownRemaining > 0 || !selectedEmail} 
+            disabled={sendingEmail || cooldownRemaining > 0 || !selectedEmail}
             style={{ width: '100%', padding: '0.8rem' }}
           >
-            {cooldownRemaining > 0 
+            {cooldownRemaining > 0
               ? `Espera ${Math.floor(cooldownRemaining / 60)}:${(cooldownRemaining % 60).toString().padStart(2, '0')} para reenviar`
               : sendingEmail ? 'Enviando...' : 'Enviar Email'}
           </button>

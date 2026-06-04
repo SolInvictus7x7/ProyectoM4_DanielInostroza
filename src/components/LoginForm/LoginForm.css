@@ -1,8 +1,9 @@
 /* ─── Auth card shell ─────────────────────────────────────────── */
 .auth-card {
-  background: #ffffff;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
-  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.10);
+  box-shadow: var(--shadow-lg);
   padding: 2.5rem 2rem 2rem;
   width: 100%;
   max-width: 400px;
@@ -12,7 +13,7 @@
   margin: 0 0 1.5rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--text-primary);
   text-align: center;
 }
 
@@ -27,24 +28,24 @@
 .form-group label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #444;
+  color: var(--text-secondary);
 }
 
 .form-group input {
   padding: 0.65rem 0.9rem;
-  border: 1.5px solid #dde1e7;
+  border: 1.5px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.95rem;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  background: #f8f9fb;
-  color: #1a1a2e;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .form-group input:focus {
-  border-color: #6c63ff;
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
-  background: #fff;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(178, 24, 24, 0.2);
+  background: var(--bg-input);
 }
 
 /* ─── Submit button ───────────────────────────────────────────── */
@@ -52,14 +53,14 @@
   width: 100%;
   padding: 0.75rem;
   margin-top: 0.25rem;
-  background: linear-gradient(135deg, #6c63ff, #48c6ef);
+  background: linear-gradient(135deg, var(--accent), #e53935);
   color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,14 +81,14 @@
 .btn-google {
   width: 100%;
   padding: 0.7rem;
-  background: #fff;
-  color: #3c4043;
-  border: 1.5px solid #dde1e7;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,8 +96,9 @@
 }
 
 .btn-google:hover:not(:disabled) {
-  background: #f1f3f4;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
@@ -115,7 +117,7 @@
   align-items: center;
   gap: 0.75rem;
   margin: 1.25rem 0;
-  color: #aaa;
+  color: var(--text-muted);
   font-size: 0.82rem;
 }
 
@@ -124,7 +126,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: #e4e7ec;
+  background: var(--border-color);
 }
 
 /* ─── Feedback messages ───────────────────────────────────────── */
@@ -146,22 +148,22 @@
 }
 
 .auth-feedback.success {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
 }
 
 .auth-feedback.error {
-  background: #fdecea;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
 }
 
 /* ─── Spinner ─────────────────────────────────────────────────── */
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2.5px solid rgba(255,255,255,0.4);
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -169,8 +171,8 @@
 }
 
 .spinner-dark {
-  border-color: rgba(60,64,67,0.25);
-  border-top-color: #3c4043;
+  border-color: rgba(255, 255, 255, 0.25);
+  border-top-color: var(--text-primary);
 }
 
 @keyframes spin {
