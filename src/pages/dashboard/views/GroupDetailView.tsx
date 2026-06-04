@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
-  doc, getDoc, collection, query, where, getDocs, setDoc, updateDoc, arrayUnion, Timestamp 
+  doc, getDoc, collection, query, where, getDocs, setDoc, updateDoc, arrayUnion, arrayRemove, Timestamp, deleteDoc
 } from 'firebase/firestore';
 import { db } from '../../../services/firebase';
 import { useAuth } from '../../../services/auth';
@@ -178,6 +178,22 @@ function GroupDetailView() {
     }
   };
 
+  const handleDeleteTask = async (tid: string) => {
+    if (!gid) return;
+    try {
+      await deleteDoc(doc(db, 'tasks', tid));
+      setTasks(prev => prev.filter(t => t.tid !== tid));
+      
+      // Clean up the tasks array in the group document
+      await updateDoc(doc(db, 'groups', gid), {
+        tasks: arrayRemove(tid)
+      });
+    } catch (err) {
+      console.error("Error deleting task:", err);
+      alert("Error al eliminar la tarea. ¿Eres administrador?");
+    }
+  };
+
   if (loading) return <div className="dashboard-subview"><span className="page-spinner" /></div>;
   if (!group) return <div className="dashboard-subview"><p>Grupo no encontrado o sin acceso.</p></div>;
 
@@ -281,6 +297,7 @@ function GroupDetailView() {
                   isAdmin={isAdmin}
                   onToggleComplete={handleToggleTaskComplete}
                   onUpdateTask={handleUpdateTask}
+                  onDeleteTask={handleDeleteTask}
                 />
               ))
             )}

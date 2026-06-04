@@ -22,9 +22,10 @@ interface TaskCardProps {
   isAdmin: boolean;
   onToggleComplete: (tid: string, current: boolean) => void;
   onUpdateTask: (tid: string, updates: Partial<Task>) => void;
+  onDeleteTask?: (tid: string) => void;
 }
 
-function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask }: TaskCardProps) {
+function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask, onDeleteTask }: TaskCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDesc, setEditDesc] = useState(task.description);
@@ -104,13 +105,28 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask 
             </div>
           )}
 
-          <div className="form-actions">
-            <button type="button" className="btn-secondary" onClick={handleCancel}>
-              Cancelar
-            </button>
-            <button type="button" className="btn-primary" disabled={!editTitle.trim()} onClick={handleSave}>
-              Guardar
-            </button>
+          <div className="form-actions" style={{ justifyContent: 'space-between' }}>
+            {onDeleteTask ? (
+              <button 
+                type="button" 
+                className="btn-danger" 
+                onClick={() => {
+                  if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                    onDeleteTask(task.tid);
+                  }
+                }}
+              >
+                Eliminar
+              </button>
+            ) : <div />}
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button type="button" className="btn-secondary" onClick={handleCancel}>
+                Cancelar
+              </button>
+              <button type="button" className="btn-primary" disabled={!editTitle.trim()} onClick={handleSave}>
+                Guardar
+              </button>
+            </div>
           </div>
         </div>
       </div>

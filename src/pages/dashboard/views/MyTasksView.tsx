@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, arrayRemove, Timestamp } from 'firebase/firestore';
 import { db } from '../../../services/firebase';
 import { useAuth } from '../../../services/auth';
 import TaskCard from '../components/TaskCard';
@@ -128,6 +128,26 @@ function MyTasksView() {
     }
   };
 
+  const handleDeleteTask = async (tid: string, gid: string) => {
+    try {
+      await deleteDoc(doc(db, 'tasks', tid));
+      
+      // Remove from the local state
+      setGroupedTasks(prev => prev.map(group => ({
+        ...group,
+        tasks: group.tasks.filter(t => t.tid !== tid)
+      })));
+
+      // Clean up the tasks array in the group document
+      await updateDoc(doc(db, 'groups', gid), {
+        tasks: arrayRemove(tid)
+      });
+    } catch (err) {
+      console.error("Error deleting task:", err);
+      alert("Error al eliminar la tarea. ¿Eres administrador?");
+    }
+  };
+
   if (loading) return <div className="dashboard-subview"><span className="page-spinner" /></div>;
 
   return (
@@ -160,6 +180,7 @@ function MyTasksView() {
                       isAdmin={isAdmin}
                       onToggleComplete={handleToggleTaskComplete}
                       onUpdateTask={handleUpdateTask}
+                      onDeleteTask={() => handleDeleteTask(t.tid, groupData.gid)}
                     />
                   ))}
                 </div>

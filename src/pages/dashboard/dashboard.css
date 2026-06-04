@@ -487,6 +487,21 @@
   background: #e2e8f0;
 }
 
+.btn-danger {
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-danger:hover {
+  background: #fecaca;
+}
+
 .task-card {
   padding: 1.2rem;
   display: flex;
