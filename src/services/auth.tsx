@@ -32,25 +32,30 @@ export function Authenticator({ children }: AuthenticatorProps) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        try {
-          const userDocRef = doc(db, 'users', firebaseUser.uid);
-          const userDoc = await getDoc(userDocRef);
+        // Ejecutar la sincronización con Firestore en segundo plano
+        // para no bloquear la resolución del estado de autenticación en la UI.
+        const syncUserDoc = async () => {
+          try {
+            const userDocRef = doc(db, 'users', firebaseUser.uid);
+            const userDoc = await getDoc(userDocRef);
 
-          const userData = userDoc.data();
-          const shouldUpdate = !userDoc.exists() || !userData?.email;
+            const userData = userDoc.data();
+            const shouldUpdate = !userDoc.exists() || !userData?.email;
 
-          if (shouldUpdate) {
-            await setDoc(userDocRef, {
-              uid: firebaseUser.uid,
-              username: firebaseUser.displayName || userData?.username || '',
-              email: firebaseUser.email || '',
-            }, { merge: true });
+            if (shouldUpdate) {
+              await setDoc(userDocRef, {
+                uid: firebaseUser.uid,
+                username: firebaseUser.displayName || userData?.username || '',
+                email: firebaseUser.email || '',
+              }, { merge: true });
+            }
+          } catch (error) {
+            console.error("Error de permisos o conexión en Firestore al actualizar email del usuario:", error);
           }
-        } catch (error) {
-          console.error("Error de permisos o conexión en Firestore al actualizar email del usuario:", error);
-        }
+        };
+        syncUserDoc();
       }
 
       setUser(firebaseUser);
