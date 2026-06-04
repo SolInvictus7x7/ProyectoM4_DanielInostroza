@@ -28,6 +28,7 @@ interface Task {
 interface UserProfile {
   uid: string;
   username: string;
+  email?: string;
 }
 
 function GroupDetailView() {
@@ -49,6 +50,36 @@ function GroupDetailView() {
   // Invite member state
   const [newMemberName, setNewMemberName] = useState('');
   const [inviting, setInviting] = useState(false);
+
+  // Email state
+  const [selectedEmail, setSelectedEmail] = useState<string>('');
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+
+  useEffect(() => {
+    if (user && !selectedEmail) {
+      setSelectedEmail(user.email || '');
+    }
+    
+    if (user) {
+      const lastSent = localStorage.getItem(`email_cooldown_${user.uid}`);
+      if (lastSent) {
+        const elapsed = Date.now() - parseInt(lastSent, 10);
+        const remaining = 5 * 60 * 1000 - elapsed;
+        if (remaining > 0) {
+          setCooldownRemaining(Math.ceil(remaining / 1000));
+        }
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const interval = setInterval(() => {
+      setCooldownRemaining(prev => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownRemaining]);
 
   useEffect(() => {
     if (!gid || !user) return;
@@ -194,6 +225,44 @@ function GroupDetailView() {
     }
   };
 
+  const handleSendEmail = async () => {
+    if (!selectedEmail || !group) return;
+    
+    setSendingEmail(true);
+    try {
+      const taskSummary = tasks.length === 0 
+        ? 'No hay tareas en este grupo actualmente.' 
+        : tasks.map(t => `- [${t.complete ? 'X' : ' '}] ${t.title}: ${t.description || 'Sin descripción'}`).join('\n');
+
+      const body = {
+        to: selectedEmail,
+        summary: `Resumen de Tareas para el Grupo: ${group.title}\n\n${taskSummary}`
+      };
+
+      const res = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Error al enviar el correo');
+      }
+
+      alert('¡Correo enviado exitosamente!');
+      if (user) {
+        localStorage.setItem(`email_cooldown_${user.uid}`, Date.now().toString());
+      }
+      setCooldownRemaining(5 * 60);
+    } catch (err: any) {
+      console.error(err);
+      alert('Ocurrió un error al enviar el correo: ' + err.message);
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
   if (loading) return <div className="dashboard-subview"><span className="page-spinner" /></div>;
   if (!group) return <div className="dashboard-subview"><p>Grupo no encontrado o sin acceso.</p></div>;
 
@@ -330,6 +399,37 @@ function GroupDetailView() {
                 {inviting ? 'Añadiendo...' : 'Añadir'}
               </button>
             </form>
+          )}
+
+          {isAdmin && (
+            <div className="card form-invite" style={{ marginTop: '1rem' }}>
+              <h4>Enviar Resumen de Tareas</h4>
+              <select 
+                value={selectedEmail} 
+                onChange={e => setSelectedEmail(e.target.value)}
+                disabled={sendingEmail || cooldownRemaining > 0}
+                style={{ width: '100%', padding: '0.8rem', marginBottom: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+              >
+                {/* Fallback to user email if the user is missing an email in their profile */}
+                <option value={user?.email || ''}>Tú ({user?.email})</option>
+                {memberProfiles
+                  .filter(m => m.uid !== user?.uid && m.email)
+                  .map(m => (
+                  <option key={m.uid} value={m.email}>{m.username} ({m.email})</option>
+                ))}
+              </select>
+              
+              <button 
+                className="btn-primary" 
+                onClick={handleSendEmail}
+                disabled={sendingEmail || cooldownRemaining > 0 || !selectedEmail} 
+                style={{ width: '100%', padding: '0.8rem' }}
+              >
+                {cooldownRemaining > 0 
+                  ? `Espera ${Math.floor(cooldownRemaining / 60)}:${(cooldownRemaining % 60).toString().padStart(2, '0')} para reenviar`
+                  : sendingEmail ? 'Enviando...' : 'Enviar Email'}
+              </button>
+            </div>
           )}
         </aside>
       </div>

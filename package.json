@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.1061.0",
+    "@vercel/node": "^5.8.11",
     "firebase": "^12.14.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.16.0"
+    "react-router-dom": "^7.16.0",
+    "vercel": "^54.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -28,5 +31,10 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12"
+  },
+  "allowScripts": {
+    "@firebase/util@1.15.1": true,
+    "esbuild@0.27.0": true,
+    "protobufjs@7.6.2": true
   }
 }

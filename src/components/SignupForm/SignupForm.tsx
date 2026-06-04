@@ -30,11 +30,11 @@ interface SignupFormProps {
 function SignupForm({ onSuccess }: SignupFormProps) {
   const { signUp, signInWithGoogle } = useAuth();
 
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirm, setConfirm]   = useState('');
+  const [confirm, setConfirm] = useState('');
   const [username, setUsername] = useState('');
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
 
@@ -78,7 +78,6 @@ function SignupForm({ onSuccess }: SignupFormProps) {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      // Google sign-in logs the user in directly — auth context handles redirect
     } catch (err: unknown) {
       const code = (err as { code?: string }).code ?? '';
       if (code !== 'auth/popup-closed-by-user') {

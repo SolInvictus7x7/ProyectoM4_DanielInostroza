@@ -38,15 +38,18 @@ export function Authenticator({ children }: AuthenticatorProps) {
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           const userDoc = await getDoc(userDocRef);
 
-          if (!userDoc.exists()) {
+          const userData = userDoc.data();
+          const shouldUpdate = !userDoc.exists() || !userData?.email;
+
+          if (shouldUpdate) {
             await setDoc(userDocRef, {
               uid: firebaseUser.uid,
-              username: firebaseUser.displayName || '',
-            });
+              username: firebaseUser.displayName || userData?.username || '',
+              email: firebaseUser.email || '',
+            }, { merge: true });
           }
         } catch (error) {
-          console.error(" Error de permisos o conexión en Firestore al crear usuario:", error);
-          // Si ves este error en consola, revisa las Reglas de Seguridad de tu base de datos Firestore.
+          console.error("Error de permisos o conexión en Firestore al actualizar email del usuario:", error);
         }
       }
 
