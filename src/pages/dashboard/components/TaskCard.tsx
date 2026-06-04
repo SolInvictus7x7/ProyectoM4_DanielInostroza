@@ -1,20 +1,5 @@
 import { useState } from 'react';
-import { Timestamp } from 'firebase/firestore';
-
-interface UserProfile {
-  uid: string;
-  username: string;
-}
-
-interface Task {
-  tid: string;
-  title: string;
-  description: string;
-  complete: boolean;
-  'created-at': Timestamp;
-  'assigned-to': string;
-  members: string[]; 
-}
+import type { Task, UserProfile } from '../../../types';
 
 interface TaskCardProps {
   task: Task;
@@ -32,9 +17,9 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
   const [editMembers, setEditMembers] = useState<string[]>(task.members);
 
   const dateStr = task['created-at'] ? task['created-at'].toDate().toLocaleDateString() : '';
-  
-  const description = task.description?.length > 300 
-    ? task.description.substring(0, 300) + '...' 
+
+  const description = task.description?.length > 300
+    ? task.description.substring(0, 300) + '...'
     : task.description;
 
   const assignedProfiles = task.members.map(uid => groupMembers.find(m => m.uid === uid)).filter(Boolean) as UserProfile[];
@@ -59,22 +44,22 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
     return (
       <div className="card task-card">
         <div className="create-task-form" style={{ marginTop: 0, padding: 0, boxShadow: 'none', border: 'none' }}>
-          <input 
-            type="text" 
-            placeholder="Título de la tarea" 
+          <input
+            type="text"
+            placeholder="Título de la tarea"
             value={editTitle}
             onChange={e => setEditTitle(e.target.value)}
             required
           />
-          
-          <textarea 
-            placeholder="Descripción (opcional, máx 300 caracteres)" 
+
+          <textarea
+            placeholder="Descripción (opcional, máx 300 caracteres)"
             value={editDesc}
             onChange={e => setEditDesc(e.target.value)}
             maxLength={300}
           />
 
-          <select 
+          <select
             value=""
             onChange={(e) => {
               const selectedUid = e.target.value;
@@ -88,7 +73,7 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
               .filter(m => !editMembers.includes(m.uid))
               .map(m => (
                 <option key={m.uid} value={m.uid}>{m.username}</option>
-            ))}
+              ))}
           </select>
 
           {editMembers.length > 0 && (
@@ -107,9 +92,9 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
 
           <div className="form-actions" style={{ justifyContent: 'space-between' }}>
             {onDeleteTask ? (
-              <button 
-                type="button" 
-                className="btn-danger" 
+              <button
+                type="button"
+                className="btn-danger"
                 onClick={() => {
                   if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
                     onDeleteTask(task.tid);
@@ -136,19 +121,19 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
   return (
     <div className="card task-card">
       <div className="task-card-header">
-        <input 
-          type="checkbox" 
-          checked={task.complete} 
-          onChange={() => onToggleComplete(task.tid, task.complete)} 
+        <input
+          type="checkbox"
+          checked={task.complete}
+          onChange={() => onToggleComplete(task.tid, task.complete)}
         />
         <div className="task-card-title-area">
           <h4 className={task.complete ? 'completed' : ''}>{task.title}</h4>
           <span className="task-date">Creado: {dateStr}</span>
         </div>
-        
+
         {isAdmin && (
-          <button 
-            className="btn-edit-task" 
+          <button
+            className="btn-edit-task"
             onClick={() => setIsEditing(true)}
             aria-label="Editar Tarea"
             title="Editar Tarea"
@@ -157,7 +142,7 @@ function TaskCard({ task, groupMembers, isAdmin, onToggleComplete, onUpdateTask,
           </button>
         )}
       </div>
-      
+
       {description && (
         <p className="task-description">{description}</p>
       )}

@@ -1,12 +1,12 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { Home, Dashboard, About } from '../index';
-import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute';
-
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import Home from '../pages/home/home';
+import Dashboard from '../pages/dashboard/dashboard';
+import About from '../pages/about/about';
+import { ProtectedRoute } from '../components';
 import ProfileView from '../pages/dashboard/views/ProfileView';
 import GroupsListView from '../pages/dashboard/views/GroupsListView';
 import GroupDetailView from '../pages/dashboard/views/GroupDetailView';
 import MyTasksView from '../pages/dashboard/views/MyTasksView';
-import { Navigate } from 'react-router-dom';
 
 const router = createBrowserRouter([
     {

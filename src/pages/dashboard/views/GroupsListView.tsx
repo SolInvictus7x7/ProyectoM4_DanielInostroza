@@ -1,22 +1,15 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from '../../../services/firebase';
 import { useAuth } from '../../../services/auth';
-
-interface Group {
-  gid: string;
-  title: string;
-  'admin-uid': string[];
-  members: string[];
-  tasks: string[];
-}
+import type { Group } from '../../../types';
 
 function GroupsListView() {
   const { user } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // New group form state
   const [showForm, setShowForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -48,7 +41,7 @@ function GroupsListView() {
     try {
       // 1. Generate a new document reference with a native ID
       const newGroupRef = doc(collection(db, 'groups'));
-      
+
       const newGroupData: Group = {
         gid: newGroupRef.id,
         title: newTitle.trim(),
@@ -65,7 +58,6 @@ function GroupsListView() {
       setNewTitle('');
       setShowForm(false);
     } catch (err) {
-      console.error("Error creating group:", err);
       alert("Error al crear el grupo. Revisa tus permisos.");
     } finally {
       setCreating(false);
@@ -80,8 +72,8 @@ function GroupsListView() {
     <div className="dashboard-subview groups-list-view">
       <div className="view-header">
         <h2>Mis Grupos</h2>
-        <button 
-          className="btn-primary" 
+        <button
+          className="btn-primary"
           onClick={() => setShowForm(!showForm)}
         >
           {showForm ? 'Cancelar' : '+ Nuevo Grupo'}
@@ -90,9 +82,9 @@ function GroupsListView() {
 
       {showForm && (
         <form className="create-group-form card" onSubmit={handleCreateGroup}>
-          <input 
-            type="text" 
-            placeholder="Nombre del grupo..." 
+          <input
+            type="text"
+            placeholder="Nombre del grupo..."
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             disabled={creating}

@@ -1,30 +1,9 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, arrayRemove, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../../../services/firebase';
 import { useAuth } from '../../../services/auth';
-import TaskCard from '../components/TaskCard';
-
-interface Group {
-  gid: string;
-  title: string;
-  'admin-uid': string[];
-  members: string[];
-}
-
-interface Task {
-  tid: string;
-  title: string;
-  description: string;
-  complete: boolean;
-  'created-at': Timestamp;
-  'assigned-to': string;
-  members: string[];
-}
-
-interface UserProfile {
-  uid: string;
-  username: string;
-}
+import { TaskCard } from '../components';
+import type { Group, Task, UserProfile } from '../../../types';
 
 interface GroupedTasks {
   groupData: Group;

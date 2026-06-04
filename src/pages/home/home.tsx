@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './home.css';
-import LoginForm from '../../components/LoginForm/LoginForm';
-import SignupForm from '../../components/SignupForm/SignupForm';
+import { LoginForm, SignupForm } from '../../components';
 import { useAuth } from '../../services/auth';
 
 type AuthTab = 'signin' | 'signup';
