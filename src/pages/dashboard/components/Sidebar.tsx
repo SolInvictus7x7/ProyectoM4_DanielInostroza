@@ -13,7 +13,7 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {/* Overlay for mobile */}
       {isOpen && <div className="sidebar-overlay" onClick={onClose} aria-hidden="true" />}
-      
+
       <aside className={`dashboard-sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <h2>TODO List</h2>
@@ -23,26 +23,27 @@ function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink 
-            to="/dashboard/profile" 
+          <NavLink
+            to="/dashboard/profile"
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
             onClick={onClose}
           >
             Mi Perfil
           </NavLink>
-          <NavLink 
-            to="/dashboard/groups" 
+          <NavLink
+            to="/dashboard/groups"
             className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
             onClick={onClose}
           >
             Mis Grupos
           </NavLink>
-          <NavLink 
-            to="/dashboard/tasks" 
-            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          <NavLink
+            to="/dashboard/tasks"
+            className={({ isActive }) => `sidebar-link sidebar-link--with-sub ${isActive ? 'active' : ''}`}
             onClick={onClose}
           >
-            Mis Tareas
+            Ver Tareas
+            <span className="sidebar-link-sub">Listado de mis tareas</span>
           </NavLink>
         </nav>
 

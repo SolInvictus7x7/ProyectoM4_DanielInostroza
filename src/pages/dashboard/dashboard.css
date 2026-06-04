@@ -96,6 +96,46 @@
   border-radius: 4px 8px 8px 4px;
 }
 
+/* ── "Ver Tareas" link: subtitle that cuts into the active/hover pill ── */
+.sidebar-link--with-sub {
+  position: relative;
+  /* Extra bottom padding creates space for the subtitle to emerge into */
+  padding-bottom: 1.6rem;
+}
+
+.sidebar-link-sub {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+  white-space: nowrap;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 99px;
+  padding: 0.15rem 0.55rem;
+  /* Hidden on default — only shows on hover/active */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast), color var(--transition-fast),
+    background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.sidebar-link--with-sub:hover .sidebar-link-sub,
+.sidebar-link--with-sub.active .sidebar-link-sub {
+  opacity: 1;
+}
+
+.sidebar-link--with-sub.active .sidebar-link-sub {
+  color: var(--accent);
+  background: var(--bg-primary);
+  border-color: var(--accent);
+}
+
 .sidebar-footer {
   padding: 1.5rem;
   border-top: 1px solid var(--border-color);
